@@ -1,6 +1,7 @@
-﻿@echo off
-chcp 65001 >nul
+REM @echo off
 setlocal enabledelayedexpansion
+
+chcp 65001 >nul
 
 :: ============================================
 :: ИНИЦИАЛИЗАЦИЯ ПЕРЕМЕННЫХ
@@ -106,7 +107,7 @@ set CONNECT_STR=
 :: ============================================
 echo Запустите конфигуратора проверьте в нем версию платформы и конфигурации
 echo а после загрузите, что необходимо, в папку /upd1c на рабочем столе без распаковки
-echo "!found_starter_path!" DESIGNER /F "!base_path!" "!connection_string!
+echo "!found_starter_path!" DESIGNER /F "!base_path!" !connection_string!
 REM "%found_starter_path%" DESIGNER /F "!base_path!" !connection_string! 
 
 if defined multiple_update (
@@ -331,13 +332,13 @@ echo Поиск архивов ZIP...
 :think1
 dir *.zip >nul 2>nul
 if errorlevel 1 (
-    echo Архивы обновлений конфигурации (.zip) не найдены. Попробуйте исправить ошибку
+    echo Архивы обновлений конфигурации .zip не найдены. Попробуйте исправить ошибку
     goto :think1
 )
 
 for /f "tokens=*" %%f in ('dir /b /o:d *.zip') do (
     set /a count+=1
-    echo [!count!] Найден архив: %%f
+    echo [!count!] Найден архив %%f
     
     set "folder=!count!"
     
@@ -347,7 +348,7 @@ for /f "tokens=*" %%f in ('dir /b /o:d *.zip') do (
         
         tar -xf "%%f" -C "!folder!" 2>nul
         if errorlevel 1 (
-            echo ВНИМАНИЕ: Не удалось распаковать %%f  tar
+            echo ВНИМАНИЕ не удалось распаковать %%f  tar
 			"!7z_path!" x "%%f" -o"!folder!\" -y
 			if errorlevel 1 (
 				echo ОШИБКА при попытке распаковки 7z. Попробуйте установить 7z. А после продолжайте
