@@ -613,11 +613,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ученик\\Desktop\\1C-Updater-C#\\App.csproj",
-      "projectName": "1C_Updater_CSharp",
-      "projectPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater-C#\\App.csproj",
+      "projectUniqueName": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
+      "projectName": "SanCity_Updater",
+      "projectPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
       "packagesPath": "C:\\Users\\Ученик\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater-C#\\obj\\",
+      "outputPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ученик\\AppData\\Roaming\\NuGet\\NuGet.Config"

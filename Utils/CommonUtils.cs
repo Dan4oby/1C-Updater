@@ -30,6 +30,23 @@ public static class CommonUtils
 		else Console.Title = "[SanCity] - " + status;
 	}
 
+	public static void SetState(string state, string status)
+	{
+		state = state.ToUpper();
+		state.Trim();
+		SetTitleStatus(status);
+		Log.Clear();
+		Log.WithColor($"============={state}=============\n", ConsoleColor.Magenta);
+		Log.SkipLine();
+	}
+
+	public static void Pause()
+	{
+		Console.Write("Нажмите Enter для продолжения...");
+		Console.ReadLine();
+	}
+
+
 	public static class Log {	
 		public static void WithColor(string message, ConsoleColor color)
 		{

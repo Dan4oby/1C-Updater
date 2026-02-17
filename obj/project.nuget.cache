@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "MTcWM2VzEkWpMO+8weEuZV4gtwLPGnAjNj6DvOKYDdmTYFiqRcLhSx+1Tps+WqNMDPV8x4IcvWVtsXOkl8cGQQ==",
+  "dgSpecHash": "ZsYIxd4Owdc32Oc31bkQ+/Jg/6UDROE9N904mTOAt4XT6kR8bdYNdeLVH7/JL6BtyMKiEmMGQ7Km2r4dHX9Qow==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Ученик\\Desktop\\1C-Updater-C#\\App.csproj",
+  "projectFilePath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",

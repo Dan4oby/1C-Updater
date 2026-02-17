@@ -34,6 +34,11 @@ public static class VersionUtils
 		return maxVersionPath;
 	}
 
+	public static string GetPlatformVersionFromPath(string path)
+	{
+		return path.Split(@"\")[3];
+	}
+
     public static bool VersionIsHigher(string version1, string version2)
 	{
 		if (Version.TryParse(version1, out Version v1) && 

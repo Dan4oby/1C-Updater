@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 public static class ProcessUtils
 {
-    static int RunProcess(string fileName, string arguments="", bool useShellExecute=false, bool createWindow=true, bool waitForProcess=true)
+    public static int RunProcess(string fileName, string arguments="", bool useShellExecute=false, bool createWindow=true, bool waitForProcess=true)
 	{
 		try
 		{
@@ -30,8 +30,8 @@ public static class ProcessUtils
         return 0;
 	}
 
-    static int RunProcessNoWait(string fileName)
+    public static int RunProcessNoWait(string fileName, string arguments="", bool useShellExecute=false)
     {
-        return RunProcess(fileName, waitForProcess:false);
+        return RunProcess(fileName, arguments:arguments, waitForProcess:false, useShellExecute:useShellExecute);
     }
 }

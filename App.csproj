@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<AssemblyName>1C_Updater_CSharp</AssemblyName>
+	<AssemblyName>SanCity_Updater</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

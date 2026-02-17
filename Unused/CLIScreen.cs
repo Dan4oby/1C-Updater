@@ -1,5 +1,5 @@
 using System;
-using static Utils;
+using static CommonUtils;
 
 class CLIScreen
 {

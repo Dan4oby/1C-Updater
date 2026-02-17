@@ -1,6 +1,6 @@
 public static class ArgumentUtils
 {
-    public static string GetAuthString(string login, string password)
+    static string GetAuthString(string login, string password)
     {
         if (!string.IsNullOrEmpty(login))
         {
@@ -14,8 +14,9 @@ public static class ArgumentUtils
     }
 
     public enum ONEC { ENTERPRISE, DESIGNER }
-    public static string FormResultString(ONEC mode, string IBConnectionString, string authString)
+    public static string FormArgumentString(ONEC mode, string IBConnectionString, string baseLogin, string basePassword)
     {
+        string authString = GetAuthString(baseLogin, basePassword);
         return $"{mode} /IBConnectionString {IBConnectionString} {authString}" ;
     }
 }
