@@ -7,9 +7,29 @@ using static InputUtils;
 
 public class Update1CState : IStateExecuter
 {
+	private string? foundStarterPath;
+	private string? IBConnectionString;
+	private string? baseName;
+	private string? baseLogin;
+	private string? basePassword;
+	private string? foundArchivePath;
+	private string? tmpltsPath; 
+
+	private static string updateDirName = "sancity";
+	private string? updatesDir = Path.Combine(desktop, updateDirName);
+
+	private static string GetPlatformPath()
+	{
+		return VersionUtils.FindCurrentMaxVersionPath() + @"\bin\1cv8.exe";
+	}
+
+	private static string GetCurrentDate()
+	{
+		return DateTime.Now.ToString("dd.MM.yyyy");
+	}
+
     public void Execute()
     {
-        string foundStarterPath = null;
 		foreach (string path in cStarterPossiblePaths)
 		{
 			if (File.Exists(path))
@@ -48,12 +68,10 @@ public class Update1CState : IStateExecuter
 
 		SetState("Ввод информации для работы ПО", "Ввод информации");
 
-		PlayLookAtMeSound();
-
 		ProcessUtils.RunProcessNoWait(foundStarterPath);
 
 		
-		string IBConnectionString = 
+		IBConnectionString = 
 		ControlUserForCorrectInput(
 			@"Вставьте строку подключения к информационной базе. Пример: File=""C:\Bases\BUH"";",
 			"Строка подключения неправильная!", 
@@ -97,10 +115,9 @@ public class Update1CState : IStateExecuter
 
 		if (launchOsk) ProcessUtils.RunProcessNoWait("osk.exe", useShellExecute:true);
 
-		string currentDate = DateTime.Now.ToString("dd.MM.yyyy");
 
 		Log.WriteLine("Название бэкапа базы (будет взято из пути при пропуске): ");
-		string baseName = KernelInput.ReadLine();
+		baseName = KernelInput.ReadLine();
 		if (IsEmpty(baseName))
 		{
 			string[] tokens = IBConnectionString.Split('"');
@@ -112,21 +129,21 @@ public class Update1CState : IStateExecuter
 		baseName = baseName.Replace(" ", "_");
 		baseName = baseName.Replace("-", "_");
 
-		Log.WriteLine($"Название бэкапа: {baseName}_{currentDate}.dt");
+		Log.WriteLine($"Название бэкапа: {baseName}_{GetCurrentDate()}.dt");
 		Log.SkipLine();
 
 		Log.Write("Логин ИБ (если нужен):");
-		string baseLogin = KernelInput.ReadLine();
+		baseLogin = KernelInput.ReadLine();
 		baseLogin = baseLogin.Trim();
 
-		string basePassword = "";
+		basePassword = "";
 		if (!IsEmpty(baseLogin))
 		{
 			Log.Write("Пароль ИБ (если нужен):");
 			basePassword = KernelInput.ReadLine();
 		}
 
-		string foundArchivePath = "";
+		foundArchivePath = "";
 		foreach (string path in cArchivePossiblePaths)
 		{
 			if (Directory.Exists(path))
@@ -181,7 +198,7 @@ public class Update1CState : IStateExecuter
 		Log.Success($"Найден архив 1С {foundArchivePath}");
 		Log.SkipLine();
 
-		string tmpltsPath = Path.Combine(userProfile, "AppData", "Roaming", "1C", "1cv8", "tmplts", "1c");
+		tmpltsPath = Path.Combine(userProfile, "AppData", "Roaming", "1C", "1cv8", "tmplts", "1c");
 		if (!Directory.Exists(tmpltsPath))
 		{
 			Log.Warn($"tmplts нет по пути {tmpltsPath}.");
@@ -195,46 +212,46 @@ public class Update1CState : IStateExecuter
 				}
 			);
 		}
-
-		Log.SkipLine();
-		Log.WriteLine("Запустите конфигуратор проверьте в нем версию платформы и конфигурации");
-		Log.WriteLine("а после загрузите, что необходимо, в папку User\\Desktop\\upd1c без распаковки");
-		Log.SkipLine();
 		
-		string platformVersionPath = VersionUtils.FindCurrentMaxVersionPath();
-		platformVersionPath += @"\bin\1cv8.exe";
-		string argumentString = ArgumentUtils.FormArgumentString(ArgumentUtils.ONEC.DESIGNER, IBConnectionString, baseLogin, basePassword);
-		Log.WriteLine("Строка запуска (для проверки):");
-		Log.WriteLine(string.Format(@"""{0}"" {1}", platformVersionPath, argumentString));
-		Log.SkipLine();
-
-		string manualUpdatesDir = ControlUserForCorrectInput(
+		bool userWantsAnotherUpdateDir = AskYOrN($"Папка, куда вы будете помещать обновления: {updatesDir}.\nХотите сменить директорию? (например, если обновляете не одну конфигурацию)\n");
+		
+		string manualUpdatesDir = "";
+		if (userWantsAnotherUpdateDir)
+		{
+			manualUpdatesDir = ControlUserForCorrectInput(
 			"Название папки на рабочем столе вместо upd1c, если обновляете больше 1 базы:",
 			"Неправильный формат пути!",
 			s =>
 			{
-				if (IsEmpty(s)) return true;
-
 				if (s.Contains('/')) return false;
 
 				return true;
 			}
-		);
+			);
+		}
 
-		string updatesDir;
-		if (IsEmpty(manualUpdatesDir))
+
+		if (!IsEmpty(manualUpdatesDir))
 		{
-			updatesDir = Path.Combine(desktop, "upd1c");
+			updatesDir = manualUpdatesDir;
 		}
-		else
-		{
-			updatesDir = Path.Combine(desktop, manualUpdatesDir);
-		}
+
 
 		if (!Directory.Exists(updatesDir))
 		{
 			Directory.CreateDirectory(updatesDir);
 		}
+
+		Log.WriteLine("Строка запуска (для проверки):");
+		Log.WriteLine(string.Format(@"""{0}"" {1}", GetPlatformPath(), 
+			ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)));
+		Log.SkipLine();
+		Pause();
+
+		Log.SkipLine();
+		Log.WriteLine("Запустите конфигуратор проверьте в нем версию платформы и конфигурации");
+		Log.WriteLine($"а после загрузите, что необходимо, в папку без распаковки");
+		Log.SkipLine();
 
 		ProcessUtils.RunProcess("explorer.exe", updatesDir, true, waitForProcess:false); 
 
@@ -282,21 +299,19 @@ public class Update1CState : IStateExecuter
 				{
 					ProcessUtils.RunProcess(setupExe, "/l:ru");
 				}
-
-				platformVersionPath = VersionUtils.FindCurrentMaxVersionPath();
-				platformVersionPath += @"\bin\1cv8.exe";
 			}
 		}
 
 		SetState("Выгрузка информационной базы", "Выгрузка...");
 
 		Log.WriteLine("Выгружаю информационную базу...");
-		string dtFilePath = Path.Combine(foundArchivePath, $"{baseName}_{currentDate}.dt");
+		string dtFilePath = Path.Combine(foundArchivePath, $"{baseName}_{GetCurrentDate()}.dt");
 
-		if (!File.Exists(dtFilePath)) ProcessUtils.RunProcess(platformVersionPath, arguments:$"{argumentString} /DumpIB \"{dtFilePath}\"");
+		if (!File.Exists(dtFilePath)) ProcessUtils.RunProcess(GetPlatformPath(), 
+										arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /DumpIB \"{dtFilePath}\"");
 
 		Log.Success($"Выгрузка закончена: {dtFilePath}");
-		PlayLookAtMeSound();
+
 		Pause();
 
 		SetState("Распаковка обновлений из папки", "Распаковка...");
@@ -386,30 +401,23 @@ public class Update1CState : IStateExecuter
 			string efdFile = Path.Combine(updateFolder, "1cv8.efd");
 			if (File.Exists(efdFile))
 			{
-				// Открыть папку с шаблонами в проводнике
-				try 
-				{ 
-					ProcessUtils.RunProcess("explorer.exe", tmpltsPath, true, waitForProcess:false); 
-				} catch { }
+				ProcessUtils.RunProcess("explorer.exe", tmpltsPath, true, waitForProcess:false); 
 
-				PlayLookAtMeSound();
-
-				Log.WriteLine("Темплейты открылись. Укажите полный путь к папке с установленным релизом:");
-				string updatePath = KernelInput.ReadLine();
+				string updatePath = ControlUserForCorrectInput(
+					$"Папка с шаблонами конфигураций открылась. Укажите полный путь к папке с установленным релизом:",
+					"По пути не найдено файла обновления .cfu!",
+					s =>
+					{
+						return Directory.Exists(s) && File.Exists(Path.Combine(s, "1cv8.cfu"));
+					}
+				);
 
 				string cfuFile = Path.Combine(updatePath, "1cv8.cfu");
-				if (!File.Exists(cfuFile))
-				{
-					Log.Error($"У введенного релиза не найден файл {cfuFile}");
-					Log.Error("Исправьте ошибку самостоятельно, либо досрочно завершите выполнение программы");
-					Pause();
-
-					continue;
-				}
 
 				Log.WriteLine("Обновляю конфигурацию...");
 
-				ProcessUtils.RunProcess(platformVersionPath, arguments:$"{argumentString} /UpdateCfg \"{cfuFile}\" /UpdateDBCfg");
+				ProcessUtils.RunProcess(GetPlatformPath(), 
+					arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /UpdateCfg \"{cfuFile}\" /UpdateDBCfg");
 
 				Log.Success(string.Format("Успешно установлена конфигурация {0}", currentUpdate));
 			}
@@ -417,10 +425,8 @@ public class Update1CState : IStateExecuter
 			currentUpdate++;
 		}
 
-		argumentString = ArgumentUtils.FormArgumentString(ArgumentUtils.ONEC.ENTERPRISE, IBConnectionString, baseLogin, basePassword);
-		ProcessUtils.RunProcessNoWait(platformVersionPath, argumentString);
-
-		PlayLookAtMeSound();
+		ProcessUtils.RunProcessNoWait(GetPlatformPath(), 
+			ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword));
 
 		Log.Success("Все обновления установлены");
 
@@ -432,7 +438,7 @@ public class Update1CState : IStateExecuter
 			File.AppendAllText(updateFilePath, $"Количество поставленных релизов: {fileCounter}" + Environment.NewLine);
 			if (hasRar)
 			{
-				string updateText = $"Обновлена платформа до {VersionUtils.GetPlatformVersionFromPath(platformVersionPath)}";
+				string updateText = $"Обновлена платформа до {VersionUtils.GetPlatformVersionFromPath(GetPlatformPath())}";
 				File.AppendAllText(updateFilePath, updateText + Environment.NewLine);
 			}
 		}

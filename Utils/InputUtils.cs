@@ -34,11 +34,12 @@ public static class InputUtils
         while (true)
         {
             Log.Write(askInputMessage);
-            Log.WriteLine("(д/н) (y/n)");
+            Log.WithColor("\n[д/y] ", ConsoleColor.Green);
+            Log.WithColor("[н/n/Ent]\n", ConsoleColor.Red);
             string input = KernelInput.ReadLine();
             input = input.Trim();
             input = input.ToLower();
-            if (!input.Equals("y") && !input.Equals("n") && !input.Equals("д") && !input.Equals("н")) {
+            if (!string.IsNullOrEmpty(input) && !input.Equals("y") && !input.Equals("n") && !input.Equals("д") && !input.Equals("н")) {
                 Log.Error("Неверный ввод");
             }
             else 
@@ -73,7 +74,40 @@ public static class InputUtils
         }
         while (keyInfo.Key != ConsoleKey.Enter);
 
-        Console.WriteLine();
+        Log.SkipLine();
         return password;
+    }
+
+    public static int UserHaveToChooseBetween(string askInputMessage, string[] variants)
+    {
+        while (true)
+        {
+            SetState("Выбор варианта работы", "Выбор...");
+
+            Log.Write(askInputMessage);
+            Log.SkipLine();
+            for (int i = 0; i < variants.Length; i++)
+            {
+                Log.WriteLine($"[{i + 1}] {variants[i]}");
+            }
+            Log.SkipLine();
+            Log.Write("Ваш выбор: ");
+            string input = KernelInput.ReadLine();
+            input = input.Trim();
+            int choice;
+            try
+			{
+				choice = int.Parse(input);
+			} 
+			catch
+			{
+				Log.Error("Неверный ввод");
+				Pause();
+				continue;
+			}
+            if (choice < 1 || choice >= variants.Length) continue;
+
+            return choice;
+        }
     }
 }

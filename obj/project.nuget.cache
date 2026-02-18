@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ZsYIxd4Owdc32Oc31bkQ+/Jg/6UDROE9N904mTOAt4XT6kR8bdYNdeLVH7/JL6BtyMKiEmMGQ7Km2r4dHX9Qow==",
+  "dgSpecHash": "cS4h488exhjX9bEl04enyyqXxtNd9Z3TtWKmcYxcJpYO7MLT+en96Zw4J8NRfUR0a/P9XKuB2j2sMs38z4jklg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
   "expectedPackageFiles": [
@@ -13,10 +13,7 @@
     "C:\\Users\\Ученик\\.nuget\\packages\\naudio.wasapi\\2.2.1\\naudio.wasapi.2.2.1.nupkg.sha512",
     "C:\\Users\\Ученик\\.nuget\\packages\\naudio.winmm\\2.2.1\\naudio.winmm.2.2.1.nupkg.sha512",
     "C:\\Users\\Ученик\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
-    "C:\\Users\\Ученик\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
-    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.36\\microsoft.netcore.app.runtime.win-x64.6.0.36.nupkg.sha512",
-    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.36\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.36.nupkg.sha512",
-    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.36\\microsoft.aspnetcore.app.runtime.win-x64.6.0.36.nupkg.sha512"
+    "C:\\Users\\Ученик\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
   ],
   "logs": []
 }

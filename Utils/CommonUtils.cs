@@ -77,8 +77,8 @@ public static class CommonUtils
 		state = state.ToUpper();
 		state.Trim();
 		SetTitleStatus(status);
-		Log.Clear();
-		Log.WithColor($"================{state}================\n", ConsoleColor.Magenta);
+		Console.Clear();
+		Log.WithColorNoSaveInBuffer($"================={state}==================\n", ConsoleColor.Magenta);
 		Log.SkipLine();
 	}
 
@@ -90,8 +90,17 @@ public static class CommonUtils
 
 
 	public static class Log {	
+		public static void WithColorNoSaveInBuffer(string message, ConsoleColor color)
+		{
+			ConsoleColor originalColor = Console.ForegroundColor;
+
+			Console.ForegroundColor = color;
+			Console.Write(message);
+			Console.ForegroundColor = originalColor;
+		}
 		public static void WithColor(string message, ConsoleColor color)
 		{
+			Program.stateBuffer.AddToStringBuffer(message, ConsoleColor.White);
 			ConsoleColor originalColor = Console.ForegroundColor;
 
 			Console.ForegroundColor = color;
@@ -105,16 +114,21 @@ public static class CommonUtils
 
 		public static void Warn(string message) => WithColor("[WARN] " + message + "\n", ConsoleColor.Yellow);
 
-		public static void SkipLine() => Console.WriteLine();
+		public static void SkipLine() {
+			Program.stateBuffer.AddToStringBuffer("\n", ConsoleColor.White);
+			Console.WriteLine();
+		}
 
 		public static void SkipLine(int n) {
 			for (int i = 0; i < n; i++) SkipLine();
 		}
 
-		public static void Write(string message) => Console.Write(message);
+		public static void Write(string message) 
+		{
+			Program.stateBuffer.AddToStringBuffer(message, ConsoleColor.White);
+			Console.Write(message);
+		} 
 
-		public static void WriteLine(string message) => Console.WriteLine(message);
-
-		public static void Clear() => Console.Clear();
+		public static void WriteLine(string message) => Console.Write(message + "\n");
 	}
 }

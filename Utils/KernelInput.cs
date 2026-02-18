@@ -37,6 +37,8 @@ public static class KernelInput
             if (result.EndsWith("\r\n")) return result.Substring(0, result.Length - 2);
             if (result.EndsWith("\n"))   return result.Substring(0, result.Length - 1);
             if (result.EndsWith("\r"))   return result.Substring(0, result.Length - 1);
+
+            Program.stateBuffer.AddToStringBuffer(result, ConsoleColor.White);
             return result;
         }
         else

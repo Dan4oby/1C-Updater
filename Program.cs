@@ -12,7 +12,9 @@ using static InputUtils;
 
 
 class Program {
+	public static ProgramStateBuffer stateBuffer;
 	static Program() {
+		stateBuffer = new ProgramStateBuffer();
 
 		Console.OutputEncoding = Encoding.UTF8;
 		Console.InputEncoding = Encoding.UTF8;
@@ -27,43 +29,28 @@ class Program {
 		Log.WriteLine("Введите пароль, чтобы пользоваться программой");
 		string password = ReadPassword();
 
-		if (!password.Equals("1234")) return;
+		if (!password.Equals("1256")) return;
 		
 		IStateExecuter stateToExecute = null;
 		while (true)
 		{
-			SetState("Выбор режима работы программы", "Выбор режима");
-
-			Log.WriteLine("Выберите, что вы хотите сделать:");
-			Log.WriteLine("1"); // обновить 1с
-			Log.WriteLine("2"); // удалить кеш
-			Log.WriteLine("3"); // восстановить целостность БД
-			string input = KernelInput.ReadLine();
-			input = input.Trim();
-
-			int choice = 0;
-			try
-			{
-				choice = int.Parse(input);
-			} 
-			catch
-			{
-				Log.Error("Неверный ввод");
-				Pause();
-				continue;
-			}
-
-			if (choice < 1 || choice > 3) {
-				continue;
-			}
+			int choice = UserHaveToChooseBetween(
+				"Выберите режим работы программы: ",
+				new string[] {
+					"",
+					"",
+					""
+					}
+			);
 
 			if (choice == 1) stateToExecute = new Update1CState();
 			if (choice == 2) stateToExecute = null;
 			if (choice == 3) stateToExecute = null;
-
+			
+			stateBuffer.StateRedraw();
 			if (stateToExecute != null)
 			{
-				Log.Clear();
+				Console.Clear();
 				stateToExecute.Execute();
 				stateToExecute = null;
 			}

@@ -13,10 +13,19 @@ public static class ArgumentUtils
         return "";
     }
 
-    public enum ONEC { ENTERPRISE, DESIGNER }
-    public static string FormArgumentString(ONEC mode, string IBConnectionString, string baseLogin, string basePassword)
+    private static string FormArgumentString(string mode, string IBConnectionString, string baseLogin, string basePassword)
     {
         string authString = GetAuthString(baseLogin, basePassword);
         return $"{mode} /IBConnectionString {IBConnectionString} {authString}" ;
+    }
+
+    public static string FormArgumentStringDesigner(string IBConnectionString, string baseLogin, string basePassword)
+    {
+        return FormArgumentString("DESIGNER", IBConnectionString, baseLogin, basePassword);
+    }
+
+    public static string FormArgumentStringEnterprise(string IBConnectionString, string baseLogin, string basePassword)
+    {
+        return FormArgumentString("ENTERPRISE", IBConnectionString, baseLogin, basePassword);
     }
 }
