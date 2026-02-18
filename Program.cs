@@ -11,10 +11,10 @@ using static CommonUtils;
 using static InputUtils;
 
 
-class Program {
-	public static ProgramStateBuffer stateBuffer;
+public static class Program {
+	public static string headerState = "";
+	public static string titleState = "";
 	static Program() {
-		stateBuffer = new ProgramStateBuffer();
 
 		Console.OutputEncoding = Encoding.UTF8;
 		Console.InputEncoding = Encoding.UTF8;
@@ -32,6 +32,7 @@ class Program {
 		if (!password.Equals("1256")) return;
 		
 		IStateExecuter stateToExecute = null;
+
 		while (true)
 		{
 			int choice = UserHaveToChooseBetween(
@@ -46,8 +47,7 @@ class Program {
 			if (choice == 1) stateToExecute = new Update1CState();
 			if (choice == 2) stateToExecute = null;
 			if (choice == 3) stateToExecute = null;
-			
-			stateBuffer.StateRedraw();
+
 			if (stateToExecute != null)
 			{
 				Console.Clear();

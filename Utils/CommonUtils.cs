@@ -72,14 +72,20 @@ public static class CommonUtils
 		else Console.Title = "[SanCity] - " + status;
 	}
 
-	public static void SetState(string state, string status)
+	public static void SetState(string header, string title)
 	{
-		state = state.ToUpper();
-		state.Trim();
-		SetTitleStatus(status);
+		header = header.ToUpper();
+		header.Trim();
+		SetTitleStatus(title);
 		Console.Clear();
-		Log.WithColorNoSaveInBuffer($"================={state}==================\n", ConsoleColor.Magenta);
+		Log.WithColor($"================={header}==================\n", ConsoleColor.Magenta);
 		Log.SkipLine();
+		Program.headerState = header;
+		Program.titleState = title;
+	}
+
+	public static void UpdateState() {
+		SetState(Program.headerState, Program.titleState);
 	}
 
 	public static void Pause()
@@ -90,17 +96,8 @@ public static class CommonUtils
 
 
 	public static class Log {	
-		public static void WithColorNoSaveInBuffer(string message, ConsoleColor color)
-		{
-			ConsoleColor originalColor = Console.ForegroundColor;
-
-			Console.ForegroundColor = color;
-			Console.Write(message);
-			Console.ForegroundColor = originalColor;
-		}
 		public static void WithColor(string message, ConsoleColor color)
 		{
-			Program.stateBuffer.AddToStringBuffer(message, ConsoleColor.White);
 			ConsoleColor originalColor = Console.ForegroundColor;
 
 			Console.ForegroundColor = color;
@@ -114,20 +111,13 @@ public static class CommonUtils
 
 		public static void Warn(string message) => WithColor("[WARN] " + message + "\n", ConsoleColor.Yellow);
 
-		public static void SkipLine() {
-			Program.stateBuffer.AddToStringBuffer("\n", ConsoleColor.White);
-			Console.WriteLine();
-		}
+		public static void SkipLine() => Console.WriteLine();
 
 		public static void SkipLine(int n) {
 			for (int i = 0; i < n; i++) SkipLine();
 		}
 
-		public static void Write(string message) 
-		{
-			Program.stateBuffer.AddToStringBuffer(message, ConsoleColor.White);
-			Console.Write(message);
-		} 
+		public static void Write(string message) => Console.Write(message);
 
 		public static void WriteLine(string message) => Console.Write(message + "\n");
 	}

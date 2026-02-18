@@ -451,19 +451,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Ученик\\.nuget\\packages\\": {}
+    "C:\\Users\\daniil\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
+      "projectUniqueName": "C:\\Users\\daniil\\Desktop\\1C-Updater\\App.csproj",
       "projectName": "SanCity_Updater",
-      "projectPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
-      "packagesPath": "C:\\Users\\Ученик\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\obj\\",
+      "projectPath": "C:\\Users\\daniil\\Desktop\\1C-Updater\\App.csproj",
+      "packagesPath": "C:\\Users\\daniil\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\daniil\\Desktop\\1C-Updater\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Ученик\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\daniil\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"

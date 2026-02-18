@@ -70,8 +70,27 @@ public class Update1CState : IStateExecuter
 
 		ProcessUtils.RunProcessNoWait(foundStarterPath);
 
+		var possibleBases = BasesFileParser.GetBases();
+
+		string[] possibleBasesOnlyNames = new string[possibleBases.Keys.Count];
+
+		int i = 0;
+		foreach (var basePair in possibleBases) {
+			possibleBasesOnlyNames[i] = basePair.Key;
+			i++;
+		}
+
+		int choice = UserHaveToChooseBetween(
+			"Выберите базу, с которой хотите работать",
+			possibleBasesOnlyNames
+		);
 		
-		IBConnectionString = 
+		
+		IBConnectionString = possibleBases.GetValueOrDefault(possibleBasesOnlyNames[choice]);
+
+
+
+		/**IBConnectionString = 
 		ControlUserForCorrectInput(
 			@"Вставьте строку подключения к информационной базе. Пример: File=""C:\Bases\BUH"";",
 			"Строка подключения неправильная!", 
@@ -105,7 +124,7 @@ public class Update1CState : IStateExecuter
 
 				return true;
 			}
-		);
+		);*/
 
 		IBConnectionString = IBConnectionString.Trim();
 		IBConnectionString = IBConnectionString.Replace(@"""", @"""""");
