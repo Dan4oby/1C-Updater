@@ -9,20 +9,62 @@ using System.Text.RegularExpressions;
 public static class CommonUtils 
 {
 
-	public static void PlayLookAtMeSound()
-	{
-		var signalGenerator = new SignalGenerator(44100, 1);
-		signalGenerator.Type = SignalGeneratorType.Sin;
-		signalGenerator.Frequency = 440;
-		signalGenerator.Gain = 0.02;
-		
-		using (var wo = new WaveOutEvent())
-		{
-			wo.Init(signalGenerator);
-			wo.Play();
-			Thread.Sleep(500);
-		}
-	}
+    public static async Task PlayLookAtMeSound()
+    {
+        await Task.Run(() =>
+        {
+			try
+			{
+				// Нота 1 (До) - 261.63 Гц
+				using (var wo = new WaveOutEvent())
+				{
+					var note1 = new SignalGenerator(44100, 1)
+					{
+						Type = SignalGeneratorType.Sin,
+						Frequency = 261.63,
+						Gain = 0.02
+					};
+					wo.Init(note1);
+					wo.Play();
+					Thread.Sleep(400);
+				} 
+
+				// Нота 2 (Ми) - 329.63 Гц
+				using (var wo = new WaveOutEvent())
+				{
+					var note2 = new SignalGenerator(44100, 1)
+					{
+						Type = SignalGeneratorType.Sin,
+						Frequency = 329.63,
+						Gain = 0.02
+					};
+					wo.Init(note2);
+					wo.Play();
+					Thread.Sleep(400);
+				}
+
+				// Нота 3 (Соль) - 392.00 Гц
+				using (var wo = new WaveOutEvent())
+				{
+					var note3 = new SignalGenerator(44100, 1)
+					{
+						Type = SignalGeneratorType.Sin,
+						Frequency = 392.00,
+						Gain = 0.02
+					};
+					wo.Init(note3);
+					wo.Play();
+					Thread.Sleep(500);
+				}
+			}
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                System.Diagnostics.Debug.WriteLine($"Sound error: {ex.Message}");
+            }
+        });
+    }
+
 
 	public static void SetTitleStatus(string status)
 	{
@@ -36,7 +78,7 @@ public static class CommonUtils
 		state.Trim();
 		SetTitleStatus(status);
 		Log.Clear();
-		Log.WithColor($"============={state}=============\n", ConsoleColor.Magenta);
+		Log.WithColor($"================{state}================\n", ConsoleColor.Magenta);
 		Log.SkipLine();
 	}
 
