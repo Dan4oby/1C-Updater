@@ -39,7 +39,7 @@ public class Update1CState : IStateExecuter
     {
 		UpdatePlatformPath();
 
-		if (IsEmpty(platformPath))
+		if (!File.Exists(platformPath))
 		{
 			Log.Error("Не найдена платформа на компьютере!");
 			Pause();
@@ -278,6 +278,8 @@ public class Update1CState : IStateExecuter
 					ProcessUtils.RunProcess(setupExe, "/l:ru");
 				}
 			}
+
+			UpdatePlatformPath();
 		}
 
 		SetState("Выгрузка информационной базы", "Выгрузка...");
