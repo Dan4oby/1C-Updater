@@ -1,10 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
-using System.Text; 
-using System.IO;
-using System.Threading;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+﻿using System.Text; 
 
 using static PathConstants;
 using static CommonUtils;
@@ -25,12 +19,15 @@ public static class Program {
 	}
 
 	static void Main(string[] args) {
-		
+		Console.Clear();
+
 		Log.WriteLine("Введите пароль, чтобы пользоваться программой");
 		string password = ReadPassword();
 
 		if (!password.Equals("1256")) return;
 		
+		if (AskYOrN("Включить экранную клавиатуру?")) ProcessUtils.RunProcessNoWait("osk.exe", useShellExecute:true);
+
 		IStateExecuter stateToExecute = null;
 
 		while (true)

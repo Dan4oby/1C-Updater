@@ -1,5 +1,3 @@
-using System;
-
 using static CommonUtils;
 
 public static class InputUtils
@@ -29,13 +27,23 @@ public static class InputUtils
         return str[0] != ' ' && str.Last() != ' ';
     }
 
-    public static bool AskYOrN(string askInputMessage)
+    public static bool AskYOrN(string askInputMessage, bool inverseEnter=false)
     {
         while (true)
         {
             Log.Write(askInputMessage);
-            Log.WithColor("\n[д/y] ", ConsoleColor.Green);
-            Log.WithColor("[н/n/Ent]\n", ConsoleColor.Red);
+            Log.SkipLine();
+            if (!inverseEnter)
+            {
+                Log.WithColor("[д/y] ", ConsoleColor.Green);
+                Log.WithColor("[н/n/Ent]\n", ConsoleColor.Red);
+            }
+            else
+            {
+                Log.WithColor("[д/y/Ent] ", ConsoleColor.Green);
+                Log.WithColor("[н/n]\n", ConsoleColor.Red);
+            }
+
             string input = KernelInput.ReadLine();
             input = input.Trim();
             input = input.ToLower();
@@ -44,7 +52,7 @@ public static class InputUtils
             }
             else 
             {
-                if (input.Equals("y") || input.Equals("д")) {
+                if (input.Equals("y") || input.Equals("д") || (inverseEnter && IsEmpty(input))) {
                     return true;
                 }
                 return false;

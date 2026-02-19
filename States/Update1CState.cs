@@ -28,24 +28,13 @@ public class Update1CState : IStateExecuter
 		return DateTime.Now.ToString("dd.MM.yyyy");
 	}
 
+	private static string GetBackupName(string str)
+	{
+		return str.Trim().Replace(" ", "_").Replace("-", "_") + "_" + GetCurrentDate() + ".dt";
+	}
+
     public void Execute()
     {
-		foreach (string path in cStarterPossiblePaths)
-		{
-			if (File.Exists(path))
-			{
-				foundStarterPath = path;
-				break;
-			}
-		}
-
-		if (foundStarterPath == null)
-		{
-			Log.Error("1C не найден ни в одном из путей.");
-			Pause();
-			return;
-		}
-
 		Log.WriteLine("Информация о дисках на ПК. Сделайте вывод перед бэкапом.");
 		Log.SkipLine();
 
@@ -68,16 +57,14 @@ public class Update1CState : IStateExecuter
 
 		SetState("Ввод информации для работы ПО", "Ввод информации");
 
-		ProcessUtils.RunProcessNoWait(foundStarterPath);
-
 		var possibleBases = BasesFileParser.GetBases();
 
 		string[] possibleBasesOnlyNames = new string[possibleBases.Keys.Count];
 
-		int i = 0;
+		int index = 0;
 		foreach (var basePair in possibleBases) {
-			possibleBasesOnlyNames[i] = basePair.Key;
-			i++;
+			possibleBasesOnlyNames[index] = basePair.Key;
+			index++;
 		}
 
 		int choice = UserHaveToChooseBetween(
@@ -88,68 +75,17 @@ public class Update1CState : IStateExecuter
 		
 		IBConnectionString = possibleBases.GetValueOrDefault(possibleBasesOnlyNames[choice]);
 
-
-
-		/**IBConnectionString = 
-		ControlUserForCorrectInput(
-			@"Вставьте строку подключения к информационной базе. Пример: File=""C:\Bases\BUH"";",
-			"Строка подключения неправильная!", 
-			s =>
-			{
-				string[] possibleConnectionWays =
-				{
-					"File",
-					"srvr"
-				};
-				string[] tokens = s.Split("=");
-
-				if (tokens.Length < 2) return false;
-
-				string connectionWay = tokens[0];
-
-				if (!possibleConnectionWays.Contains(connectionWay)) return false;
-
-				// todo: все кроме File не понятно, как парсить
-				// нужно больше примеров
-				if (!connectionWay.Equals("File")) return true;
-
-				string path = tokens[1];
-
-				if (!path.Contains(@"""") || !path.Contains(";")) return false;
-
-				path = path.Replace(@"""", "");
-				path = path.Replace(";", "");
-
-				if (!Directory.Exists(path)) return false;
-
-				return true;
-			}
-		);*/
-
-		IBConnectionString = IBConnectionString.Trim();
 		IBConnectionString = IBConnectionString.Replace(@"""", @"""""");
 		IBConnectionString = $"\"{IBConnectionString}\"";
 
-		bool launchOsk = AskYOrN("Включить экранную клавиатуру? ");
+		baseName = possibleBasesOnlyNames[choice]; 
 
-		if (launchOsk) ProcessUtils.RunProcessNoWait("osk.exe", useShellExecute:true);
-
-
-		Log.WriteLine("Название бэкапа базы (будет взято из пути при пропуске): ");
-		baseName = KernelInput.ReadLine();
-		if (IsEmpty(baseName))
+		if (AskYOrN($"Название бэкапа базы: {GetBackupName(baseName)}. Вы можете сменить название базы. Вы хотите?"))
 		{
-			string[] tokens = IBConnectionString.Split('"');
-			string path = tokens[3];
-			string[] pathTokens = path.Split('\\');
-			baseName = pathTokens[pathTokens.Length - 1];
+			Log.WriteLine("Введите другое желаемое название базы:");
+			baseName = KernelInput.ReadLine();
 		}
-		baseName = baseName.Trim();
-		baseName = baseName.Replace(" ", "_");
-		baseName = baseName.Replace("-", "_");
 
-		Log.WriteLine($"Название бэкапа: {baseName}_{GetCurrentDate()}.dt");
-		Log.SkipLine();
 
 		Log.Write("Логин ИБ (если нужен):");
 		baseLogin = KernelInput.ReadLine();
@@ -220,16 +156,22 @@ public class Update1CState : IStateExecuter
 		tmpltsPath = Path.Combine(userProfile, "AppData", "Roaming", "1C", "1cv8", "tmplts", "1c");
 		if (!Directory.Exists(tmpltsPath))
 		{
-			Log.Warn($"tmplts нет по пути {tmpltsPath}.");
-			Log.SkipLine();
-			tmpltsPath = ControlUserForCorrectInput(
-				$"Вам нужно найти, где находятся шаблоны конфигураций и вставить полный путь.",
-				"По пути ничего не найдено!",
-				s =>
-				{
-					return Directory.Exists(s);
-				}
-			);
+			tmpltsPath = TemplatesFilePathParser.GetTemplatesPath();
+
+			if (!Directory.Exists(tmpltsPath) || tmpltsPath == "")
+			{
+				Log.Warn($"tmplts нет по пути {tmpltsPath}.");
+				Log.SkipLine();
+				tmpltsPath = ControlUserForCorrectInput(
+					$"Вам нужно найти, где находятся шаблоны конфигураций и вставить полный путь.",
+					"По пути ничего не найдено!",
+					s =>
+					{
+						return Directory.Exists(s);
+					}
+				);
+			}
+
 		}
 		
 		bool userWantsAnotherUpdateDir = AskYOrN($"Папка, куда вы будете помещать обновления: {updatesDir}.\nХотите сменить директорию? (например, если обновляете не одну конфигурацию)\n");
@@ -238,7 +180,7 @@ public class Update1CState : IStateExecuter
 		if (userWantsAnotherUpdateDir)
 		{
 			manualUpdatesDir = ControlUserForCorrectInput(
-			"Название папки на рабочем столе вместо upd1c, если обновляете больше 1 базы:",
+			$"Название папки на рабочем столе вместо {updateDirName}, если обновляете больше 1 базы:",
 			"Неправильный формат пути!",
 			s =>
 			{
@@ -324,7 +266,7 @@ public class Update1CState : IStateExecuter
 		SetState("Выгрузка информационной базы", "Выгрузка...");
 
 		Log.WriteLine("Выгружаю информационную базу...");
-		string dtFilePath = Path.Combine(foundArchivePath, $"{baseName}_{GetCurrentDate()}.dt");
+		string dtFilePath = Path.Combine(foundArchivePath, GetBackupName(baseName));
 
 		if (!File.Exists(dtFilePath)) ProcessUtils.RunProcess(GetPlatformPath(), 
 										arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /DumpIB \"{dtFilePath}\"");
