@@ -15,12 +15,14 @@ public class Update1CState : IStateExecuter
 	private string? foundArchivePath;
 	private string? tmpltsPath; 
 
+	private string? platformPath;
+
 	private static string updateDirName = "sancity";
 	private string? updatesDir = Path.Combine(desktop, updateDirName);
 
-	private static string GetPlatformPath()
+	private void UpdatePlatformPath()
 	{
-		return VersionUtils.FindCurrentMaxVersionPath() + @"\bin\1cv8.exe";
+		platformPath = VersionUtils.FindCurrentMaxVersionPath() + @"\bin\1cv8.exe";
 	}
 
 	private static string GetCurrentDate()
@@ -35,6 +37,15 @@ public class Update1CState : IStateExecuter
 
     public void Execute()
     {
+		UpdatePlatformPath();
+
+		if (IsEmpty(platformPath))
+		{
+			Log.Error("Не найдена платформа на компьютере!");
+			Pause();
+			return;
+		}
+
 		Log.WriteLine("Информация о дисках на ПК. Сделайте вывод перед бэкапом.");
 		Log.SkipLine();
 
@@ -73,21 +84,18 @@ public class Update1CState : IStateExecuter
 		);
 		
 		
-		IBConnectionString = possibleBases.GetValueOrDefault(possibleBasesOnlyNames[choice]);
+		IBConnectionString = possibleBases.GetValueOrDefault(possibleBasesOnlyNames[choice - 1]);
 
 		IBConnectionString = IBConnectionString.Replace(@"""", @"""""");
 		IBConnectionString = $"\"{IBConnectionString}\"";
 
-		baseName = possibleBasesOnlyNames[choice]; 
+		baseName = possibleBasesOnlyNames[choice - 1]; 
 
 		if (AskYOrN($"Название бэкапа базы: {GetBackupName(baseName)}. Вы можете сменить название базы. Вы хотите?"))
 		{
 			Log.WriteLine("Введите другое желаемое название базы:");
 			baseName = KernelInput.ReadLine();
 		}
-
-		Log.WriteLine($"Строка подключения: {IBConnectionString}");
-
 
 		Log.Write("Логин ИБ (если нужен):");
 		baseLogin = KernelInput.ReadLine();
@@ -205,15 +213,15 @@ public class Update1CState : IStateExecuter
 			Directory.CreateDirectory(updatesDir);
 		}
 
-		if (AskYOrN("Завершить работу пользователей? Код разблокировки: КодРазрешения"))
+		/**if (AskYOrN("Завершить работу пользователей? Код разблокировки: КодРазрешения"))
 		{
-			ProcessUtils.RunProcess(GetPlatformPath(), 
+			ProcessUtils.RunProcess(platformPath, 
 							arguments:$"{ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword)}");
 
-		}
+		}*/
 
 		Log.WriteLine("Строка запуска (для проверки):");
-		Log.WriteLine(string.Format(@"""{0}"" {1}", GetPlatformPath(), 
+		Log.WriteLine(string.Format(@"""{0}"" {1}", platformPath, 
 			ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)));
 		Log.SkipLine();
 		Pause();
@@ -232,7 +240,7 @@ public class Update1CState : IStateExecuter
 			File.Delete(updateFilePath);
 
 		ProcessUtils.RunProcessNoWait("https://releases.1c.ru/total", "", useShellExecute: true);
-		Log.WriteLine("Далее начнется выгрузка ИБ, а после обновление базы");
+		Log.WriteLine("Далее начнется выгрузка ИБ, а после - обновление базы");
 		Log.Write("Нажмите enter, если папка готова и все обновления находятся в ней");
 		Console.ReadLine();
 
@@ -277,7 +285,7 @@ public class Update1CState : IStateExecuter
 		Log.WriteLine("Выгружаю информационную базу...");
 		string dtFilePath = Path.Combine(foundArchivePath, GetBackupName(baseName));
 
-		if (!File.Exists(dtFilePath)) ProcessUtils.RunProcess(GetPlatformPath(), 
+		if (!File.Exists(dtFilePath)) ProcessUtils.RunProcess(platformPath, 
 										arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /DumpIB \"{dtFilePath}\"");
 
 		Log.Success($"Выгрузка закончена: {dtFilePath}");
@@ -386,7 +394,7 @@ public class Update1CState : IStateExecuter
 
 				Log.WriteLine("Обновляю конфигурацию...");
 
-				ProcessUtils.RunProcess(GetPlatformPath(), 
+				ProcessUtils.RunProcess(platformPath, 
 					arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /UpdateCfg \"{cfuFile}\" /UpdateDBCfg");
 
 				Log.Success(string.Format("Успешно установлена конфигурация {0}", currentUpdate));
@@ -395,7 +403,7 @@ public class Update1CState : IStateExecuter
 			currentUpdate++;
 		}
 
-		ProcessUtils.RunProcessNoWait(GetPlatformPath(), 
+		ProcessUtils.RunProcessNoWait(platformPath, 
 			ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword));
 
 		Log.Success("Все обновления установлены");
@@ -408,7 +416,7 @@ public class Update1CState : IStateExecuter
 			File.AppendAllText(updateFilePath, $"Количество поставленных релизов: {fileCounter}" + Environment.NewLine);
 			if (hasRar)
 			{
-				string updateText = $"Обновлена платформа до {VersionUtils.GetPlatformVersionFromPath(GetPlatformPath())}";
+				string updateText = $"Обновлена платформа до {VersionUtils.GetPlatformVersionFromPath(platformPath)}";
 				File.AppendAllText(updateFilePath, updateText + Environment.NewLine);
 			}
 		}
