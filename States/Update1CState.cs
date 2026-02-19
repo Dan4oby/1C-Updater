@@ -86,6 +86,8 @@ public class Update1CState : IStateExecuter
 			baseName = KernelInput.ReadLine();
 		}
 
+		Log.WriteLine($"Строка подключения: {IBConnectionString}");
+
 
 		Log.Write("Логин ИБ (если нужен):");
 		baseLogin = KernelInput.ReadLine();
@@ -201,6 +203,13 @@ public class Update1CState : IStateExecuter
 		if (!Directory.Exists(updatesDir))
 		{
 			Directory.CreateDirectory(updatesDir);
+		}
+
+		if (AskYOrN("Завершить работу пользователей? Код разблокировки: КодРазрешения"))
+		{
+			ProcessUtils.RunProcess(GetPlatformPath(), 
+							arguments:$"{ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword)}");
+
 		}
 
 		Log.WriteLine("Строка запуска (для проверки):");
