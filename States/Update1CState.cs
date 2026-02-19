@@ -108,7 +108,7 @@ public class Update1CState : IStateExecuter
 			basePassword = KernelInput.ReadLine();
 		}
 
-		foundArchivePath = "";
+		
 		foreach (string path in cArchivePossiblePaths)
 		{
 			if (Directory.Exists(path))
@@ -118,6 +118,7 @@ public class Update1CState : IStateExecuter
 			}
 		}
 
+		foundArchivePath = "";
 		if (IsEmpty(foundArchivePath))
 		{
 			Log.Warn("Не был найден архив 1C");
@@ -199,6 +200,9 @@ public class Update1CState : IStateExecuter
 				return true;
 			}
 			);
+
+			manualUpdatesDir = Path.Combine(desktop, manualUpdatesDir);
+			updateDirName = manualUpdatesDir;
 		}
 
 

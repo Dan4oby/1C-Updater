@@ -48,7 +48,18 @@ public static class Program {
 			if (stateToExecute != null)
 			{
 				Console.Clear();
-				stateToExecute.Execute();
+				try
+				{
+					stateToExecute.Execute();
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex.ToString());
+					Log.Error(ex.StackTrace);
+					Pause();
+				}
+				
+				
 				stateToExecute = null;
 			}
 		}

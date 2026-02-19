@@ -30,7 +30,7 @@ public static class CommonUtils
 
 
 	public static class Log {	
-		public static void WithColor(string message, ConsoleColor color)
+		public static void WithColor(string? message, ConsoleColor color)
 		{
 			ConsoleColor originalColor = Console.ForegroundColor;
 
@@ -39,11 +39,11 @@ public static class CommonUtils
 			Console.ForegroundColor = originalColor;
 		}
 
-		public static void Success(string message) => WithColor(message + "\n", ConsoleColor.Green);
+		public static void Success(string? message) => WithColor(message + "\n", ConsoleColor.Green);
 
-		public static void Error(string message) => WithColor("[ERR] " + message + "\n", ConsoleColor.Red);
+		public static void Error(string? message) => WithColor("[ERR] " + message + "\n", ConsoleColor.Red);
 
-		public static void Warn(string message) => WithColor("[WARN] " + message + "\n", ConsoleColor.Yellow);
+		public static void Warn(string? message) => WithColor("[WARN] " + message + "\n", ConsoleColor.Yellow);
 
 		public static void SkipLine() => Console.WriteLine();
 
@@ -51,8 +51,8 @@ public static class CommonUtils
 			for (int i = 0; i < n; i++) SkipLine();
 		}
 
-		public static void Write(string message) => Console.Write(message);
+		public static void Write(string? message) => Console.Write(message);
 
-		public static void WriteLine(string message) => Console.Write(message + "\n");
+		public static void WriteLine(string? message) => Console.Write(message + "\n");
 	}
 }
