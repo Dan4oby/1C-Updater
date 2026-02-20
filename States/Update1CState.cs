@@ -46,23 +46,7 @@ public class Update1CState : IStateExecuter
 			return;
 		}
 
-		Log.WriteLine("Информация о дисках на ПК. Сделайте вывод перед бэкапом.");
-		Log.SkipLine();
-
-		DriveInfo[] allDrives = DriveInfo.GetDrives();
-
-		foreach (DriveInfo d in allDrives)
-        {
-            if (d.IsReady == true)
-            {
-				long TotalSize = d.TotalSize / 1024 / 1024 / 1024;
-				long FreeSize = d.TotalFreeSpace / 1024 / 1024 / 1024;
-				int FreeSizePercent = (int)(100 * (float)FreeSize / (float)TotalSize);
-
-                Log.Write($"\t{d.Name}  {TotalSize - FreeSize} / {TotalSize} GB | Свободное место: {FreeSizePercent}%\n");
-				Log.SkipLine();
-            }
-        }
+		ShowPCDrivesInfo();
 
 		Pause();
 
@@ -71,16 +55,25 @@ public class Update1CState : IStateExecuter
 		var possibleBases = BasesFileParser.GetBases();
 
 		string[] possibleBasesOnlyNames = new string[possibleBases.Keys.Count];
+		string[] possibleBasesOnlyNamesForList = new string[possibleBases.Keys.Count];
 
 		int index = 0;
+		int maxStrLength = 0;
+		foreach (var basePair in possibleBases) {
+			if (maxStrLength < basePair.Key.Length) maxStrLength = basePair.Key.Length;
+		}
 		foreach (var basePair in possibleBases) {
 			possibleBasesOnlyNames[index] = basePair.Key;
+
+			possibleBasesOnlyNamesForList[index] = basePair.Key;
+			for (int i = 0; i < maxStrLength - basePair.Key.Length; i++) possibleBasesOnlyNamesForList[index] += " ";
+			possibleBasesOnlyNamesForList[index] += "\t: " + basePair.Value;
 			index++;
 		}
 
 		int choice = UserHaveToChooseBetween(
 			"Выберите базу, с которой хотите работать",
-			possibleBasesOnlyNames
+			possibleBasesOnlyNamesForList
 		);
 		
 		
@@ -118,7 +111,7 @@ public class Update1CState : IStateExecuter
 			}
 		}
 
-		foundArchivePath = "";
+		
 		if (IsEmpty(foundArchivePath))
 		{
 			Log.Warn("Не был найден архив 1C");
@@ -164,12 +157,12 @@ public class Update1CState : IStateExecuter
 		Log.Success($"Найден архив 1С {foundArchivePath}");
 		Log.SkipLine();
 
-		tmpltsPath = Path.Combine(userProfile, "AppData", "Roaming", "1C", "1cv8", "tmplts", "1c");
+		tmpltsPath = Path.Combine(userProfile, "AppData", "Roaming", "1C", "1cv8", "tmplts");
 		if (!Directory.Exists(tmpltsPath))
 		{
 			tmpltsPath = TemplatesFilePathParser.GetTemplatesPath();
 
-			if (!Directory.Exists(tmpltsPath) || tmpltsPath == "")
+			if (!Directory.Exists(tmpltsPath) || IsEmpty(tmpltsPath))
 			{
 				Log.Warn($"tmplts нет по пути {tmpltsPath}.");
 				Log.SkipLine();
@@ -234,10 +227,6 @@ public class Update1CState : IStateExecuter
 		Log.WriteLine("Запустите конфигуратор проверьте в нем версию платформы и конфигурации");
 		Log.WriteLine($"а после загрузите, что необходимо, в папку без распаковки");
 		Log.SkipLine();
-
-		ProcessUtils.RunProcess("explorer.exe", updatesDir, true, waitForProcess:false); 
-
-		Directory.SetCurrentDirectory(updatesDir);
 
 		string updateFilePath = Path.Combine(updatesDir, "update.txt");
 		if (File.Exists(updateFilePath))
@@ -320,9 +309,11 @@ public class Update1CState : IStateExecuter
 		foreach (string zipFile in zipFiles)
 		{
 			fileCounter++;
-			Log.WriteLine($"[{fileCounter}] Найден архив {Path.GetFileName(zipFile)}");
+			string zipFileName = Path.GetFileName(zipFile).Split('.')[0];
 
-			string folder = Path.Combine(updatesDir, fileCounter.ToString());
+			Log.WriteLine($"[{fileCounter}] Найден архив {zipFileName}");
+
+			string folder = Path.Combine(updatesDir, zipFileName);
 			if (!Directory.Exists(folder))
 			{
 				Directory.CreateDirectory(folder);
@@ -340,7 +331,7 @@ public class Update1CState : IStateExecuter
 						Log.Error("В системе не найден tar.exe и 7zip. Установите их прямо сейчас, если не хотите неожиданного поведения!");
 					}
 
-					ArchiverUtils.UnZip(zipFile, folder, false);
+					ArchiverUtils.UnZip(zipFile, folder, true);
 				}
 			}
 
@@ -379,14 +370,18 @@ public class Update1CState : IStateExecuter
 
 		int currentUpdate = 1;
 		
-		while (currentUpdate <= fileCounter)
+		foreach (string zipFile in zipFiles)
 		{
-			string updateFolder = Path.Combine(updatesDir, currentUpdate.ToString());
-			string efdFile = Path.Combine(updateFolder, "1cv8.efd");
-			if (File.Exists(efdFile))
-			{
-				ProcessUtils.RunProcess("explorer.exe", tmpltsPath, true, waitForProcess:false); 
+			string zipFileName = Path.GetFileName(zipFile).Split('.')[0];
 
+			string folder = Path.Combine(updatesDir, zipFileName);
+
+			string efdFile = Path.Combine(folder, "1cv8.efd");
+
+			string confUpdatePath = VersionUtils.GetConfUpdatePath(tmpltsPath, zipFileName);
+
+			if (IsEmpty(confUpdatePath))
+			{
 				string updatePath = ControlUserForCorrectInput(
 					$"Папка с шаблонами конфигураций открылась. Укажите полный путь к папке с установленным релизом:",
 					"По пути не найдено файла обновления .cfu!",
@@ -395,20 +390,25 @@ public class Update1CState : IStateExecuter
 						return Directory.Exists(s) && File.Exists(Path.Combine(s, "1cv8.cfu"));
 					}
 				);
-
-				string cfuFile = Path.Combine(updatePath, "1cv8.cfu");
-
-				Log.WriteLine("Обновляю конфигурацию...");
-
-				ProcessUtils.RunProcess(platformPath, 
-					arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /UpdateCfg \"{cfuFile}\" /UpdateDBCfg");
-
-				Log.Success(string.Format("Успешно установлена конфигурация {0}", currentUpdate));
 			}
+/**
+			string mftPath = Path.Combine(confUpdatePath, "1cv8.mft");
+			if (File.Exists(mftPath))
+			{
+				string[] lines = File.ReadAllLines(mftPath);
+				if (lines.Length > 0)
+					
+			}*/
 
-			currentUpdate++;
+			string cfuFile = Path.Combine(confUpdatePath, "1cv8.cfu");
+
+
+			ProcessUtils.RunProcess(platformPath, 
+				arguments:$"{ArgumentUtils.FormArgumentStringDesigner(IBConnectionString, baseLogin, basePassword)} /UpdateCfg \"{cfuFile}\" /UpdateDBCfg");
+
+			Log.Success(string.Format("Успешно установлена конфигурация {0}", currentUpdate));
 		}
-
+		
 		ProcessUtils.RunProcessNoWait(platformPath, 
 			ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword));
 
@@ -429,4 +429,25 @@ public class Update1CState : IStateExecuter
 
 		Pause();
     }
+
+	public static void ShowPCDrivesInfo()
+	{
+		Log.WriteLine("Информация о дисках на ПК. Сделайте вывод перед бэкапом.");
+		Log.SkipLine();
+
+		DriveInfo[] allDrives = DriveInfo.GetDrives();
+
+		foreach (DriveInfo d in allDrives)
+        {
+            if (d.IsReady == true)
+            {
+				long TotalSize = d.TotalSize / 1024 / 1024 / 1024;
+				long FreeSize = d.TotalFreeSpace / 1024 / 1024 / 1024;
+				int FreeSizePercent = (int)(100 * (float)FreeSize / (float)TotalSize);
+
+                Log.Write($"\t{d.Name}  {TotalSize - FreeSize} / {TotalSize} GB | Свободное место: {FreeSizePercent}%\n");
+				Log.SkipLine();
+            }
+        }
+	}
 }

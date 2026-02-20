@@ -53,4 +53,41 @@ public static class VersionUtils
 		}
 		return false;
 	}
+
+	// некрасивое решение, но рабочее
+	public static string GetConfUpdatePath(string tmpltsPath, string zipFileName)
+	{
+		string[] tokens = zipFileName.Split('_');
+
+		int tokensCount = tokens.Length;
+
+		string[] result = new string[2];
+
+		// config name
+		result[0] = tokens[0];
+		// config version
+		for (int i = 1; i < tokensCount - 1; i++)
+		{
+			if (i != tokensCount - 2) result[1] += $"{tokens[i]}_";
+			else result[1] += $"{tokens[i]}";
+		}
+
+		string onecTemplatesPath = Path.Combine(tmpltsPath, "1c");
+
+		CommonUtils.Log.WriteLine(onecTemplatesPath);
+
+		if (!Directory.Exists(onecTemplatesPath)) return "";
+
+		string confPath = Path.Combine(onecTemplatesPath, result[0]);
+
+		CommonUtils.Log.WriteLine(confPath);
+		if (!Directory.Exists(confPath)) return "";
+
+		string confVersionPath = Path.Combine(confPath, result[1]);
+
+		CommonUtils.Log.WriteLine(confVersionPath);
+		if (!Directory.Exists(confVersionPath)) return "";
+
+		return confVersionPath;
+	}
 }

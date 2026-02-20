@@ -16,7 +16,7 @@ public static class ArgumentUtils
     private static string FormArgumentString(string mode, string IBConnectionString, string baseLogin, string basePassword)
     {
         string authString = GetAuthString(baseLogin, basePassword);
-        return $"{mode} /IBConnectionString {IBConnectionString} {authString}" ;
+        return $"{mode} /IBConnectionString {IBConnectionString} {authString} /DisableStartupDialogs /DisableStartupMessages" ;
     }
 
     public static string FormArgumentStringDesigner(string IBConnectionString, string baseLogin, string basePassword)
