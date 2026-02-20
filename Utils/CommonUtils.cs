@@ -1,5 +1,15 @@
 public static class CommonUtils 
 {
+
+	public static string GetCurrentDate()
+	{
+		return DateTime.Now.ToString("dd.MM.yyyy");
+	}
+
+	public static string GetBackupName(string str)
+	{
+		return str.Trim().Replace(" ", "_").Replace("-", "_") + "_" + GetCurrentDate() + ".dt";
+	}
 	public static void SetTitleStatus(string status)
 	{
 		if (string.IsNullOrEmpty(status)) Console.Title = "[SanCity] 1C обновления";

@@ -106,6 +106,7 @@ public static class InputUtils
             try
 			{
 				choice = int.Parse(input);
+                if (choice < 1 || choice > variants.Length) throw new Exception();
 			} 
 			catch
 			{
@@ -113,7 +114,7 @@ public static class InputUtils
 				Pause();
 				continue;
 			}
-            if (choice < 1 || choice > variants.Length) continue;
+            
 
             return choice;
         }

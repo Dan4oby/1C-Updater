@@ -5,9 +5,9 @@ public static class ArgumentUtils
         if (!string.IsNullOrEmpty(login))
         {
             if (!string.IsNullOrEmpty(password)) 
-                return string.Format(@"/N ""{0}"" /P ""{1}""", login, password);
+                return string.Format(@"/N {0} /P {1}", login, password);
 
-            return string.Format(@"/N ""{0}""", login);
+            return string.Format(@"/N {0}", login);
         }
         
         return "";

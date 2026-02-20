@@ -20,21 +20,6 @@ public class Update1CState : IStateExecuter
 	private static string updateDirName = "sancity";
 	private string? updatesDir = Path.Combine(desktop, updateDirName);
 
-	private void UpdatePlatformPath()
-	{
-		platformPath = VersionUtils.FindCurrentMaxVersionPath() + @"\bin\1cv8.exe";
-	}
-
-	private static string GetCurrentDate()
-	{
-		return DateTime.Now.ToString("dd.MM.yyyy");
-	}
-
-	private static string GetBackupName(string str)
-	{
-		return str.Trim().Replace(" ", "_").Replace("-", "_") + "_" + GetCurrentDate() + ".dt";
-	}
-
     public void Execute()
     {
 		UpdatePlatformPath();
@@ -47,7 +32,6 @@ public class Update1CState : IStateExecuter
 		}
 
 		ShowPCDrivesInfo();
-
 		Pause();
 
 		SetState("Ввод информации для работы ПО", "Ввод информации");
@@ -84,11 +68,7 @@ public class Update1CState : IStateExecuter
 
 		baseName = possibleBasesOnlyNames[choice - 1]; 
 
-		if (AskYOrN($"Название бэкапа базы: {GetBackupName(baseName)}. Вы можете сменить название базы. Вы хотите?"))
-		{
-			Log.WriteLine("Введите другое желаемое название базы:");
-			baseName = KernelInput.ReadLine();
-		}
+		Log.WriteLine($"Название бэкапа базы: {GetBackupName(baseName)}");
 
 		Log.Write("Логин ИБ (если нужен):");
 		baseLogin = KernelInput.ReadLine();
@@ -409,7 +389,7 @@ public class Update1CState : IStateExecuter
 			Log.Success(string.Format("Успешно установлена конфигурация {0}", currentUpdate));
 		}
 		
-		ProcessUtils.RunProcessNoWait(platformPath, 
+		ProcessUtils.RunProcess(platformPath, 
 			ArgumentUtils.FormArgumentStringEnterprise(IBConnectionString, baseLogin, basePassword));
 
 		Log.Success("Все обновления установлены");
@@ -429,6 +409,11 @@ public class Update1CState : IStateExecuter
 
 		Pause();
     }
+
+	private void UpdatePlatformPath()
+	{
+		platformPath = VersionUtils.FindCurrentMaxVersionPath() + @"\bin\1cv8.exe";
+	}
 
 	public static void ShowPCDrivesInfo()
 	{
