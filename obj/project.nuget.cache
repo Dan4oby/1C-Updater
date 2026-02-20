@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "ed29X7caC1914mrYKyWmrX4lmiBJeWxE95y8eCRAgn2DUmxHVNkRqF0zuNUL3jeOL8ffmp/PK1KtWUhvhbM5JQ==",
+  "dgSpecHash": "x4qTagXXaGGiP1FQRPnH+XB4MvI+RC13XuH3IB5O3ysKjBHYKz7VcFVn6JMpEAqJE3/BXJx0Auyq39OyCKM2Tg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Ученик\\Desktop\\1C-Updater\\App.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.36\\microsoft.netcore.app.runtime.win-x64.6.0.36.nupkg.sha512",
+    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.36\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.36.nupkg.sha512",
+    "C:\\Users\\Ученик\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.36\\microsoft.aspnetcore.app.runtime.win-x64.6.0.36.nupkg.sha512"
+  ],
   "logs": []
 }
